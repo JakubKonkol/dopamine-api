@@ -13,6 +13,6 @@ benchmarks/graphs
 
 # envs
 
-/environments/environment.js
+/src/environments/environment.js
 # ignore additional files using core.excludesFile
 # https://git-scm.com/docs/gitignore

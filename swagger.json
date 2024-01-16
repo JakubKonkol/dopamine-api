@@ -1,0 +1,19 @@
+{
+  "definition": {
+    "openapi": "3.1.0",
+    "info": {
+      "title": "dopamine-api with Swagger",
+      "version": "1.0.0",
+      "description": ""
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8080"
+      }
+    ]
+  },
+  "apis": ["src/routes/*.js"],
+  "openapi": "",
+  "components": {},
+  "info": {}
+}

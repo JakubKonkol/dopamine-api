@@ -1,5 +1,5 @@
 const express = require('express');
-const { getPopularMovies, getMovieById, searchMovie} = require('../services/movies');
+const { getPopularMovies, getMovieById, searchMovie} = require('../controllers/movies');
 const router = express.Router();
 router.get('/movies/popular', getPopularMovies);
 router.get('/movies/id/:movieId', async (req, res) => {

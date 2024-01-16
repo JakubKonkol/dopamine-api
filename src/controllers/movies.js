@@ -1,5 +1,4 @@
 const tmdb = require('../api/tmdb');
-const {response} = require("express");
 
 const getPopularMovies = async (req, res) => {
     try {

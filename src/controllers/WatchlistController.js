@@ -14,7 +14,7 @@ const addMovieToWatchlist = async (req, res) => {
         userData.userDetails.watchList = watchList;
         await userData.save();
 
-        return res.status(200).json({ message: 'Movie added to watchlist successfully', userData });
+        return res.status(200).json({ message: 'Movie added to watchlist successfully'});
 
     } catch (err) {
         res.status(500).json({ error: err.message || 'Internal Server Error' });
@@ -25,7 +25,7 @@ const getUserWatchlist = async (req, res) => {
      const userId = req.identity._id;
         const userData = await getUserById(userId).select('+userDetails.watchList');
         const watchList = userData.userDetails.watchList;
-        return res.status(200).json({message: 'Watchlist fetched successfully', watchList});
+        return res.status(200).json(watchList);
     }catch (err) {
         res.status(500).json({error: err.message || 'Internal Server Error'});
     }

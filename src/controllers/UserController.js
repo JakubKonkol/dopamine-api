@@ -45,7 +45,7 @@ const login = async (req, res) => {
     user.authentication.sessionToken = authentication(salt, user._id.toString())
     await user.save();
     res.cookie('sessionToken', user.authentication.sessionToken, {domain: 'localhost', path: '/'})
-    return res.status(200).json(user);
+    return res.status(200).json({message: 'Logged in successfully'});
 }
 const logout = async (req, res) => {
     const {identity} = req;

@@ -23,27 +23,32 @@ const getMovieById = async (req, res) => {
 
 const searchMovie = async (req, res) =>{
     let query = req.query.query;
-    try{
-        console.log('searching for movie with query: '+ query)
-        const response = await tmdb.get('/search/movie', {
-            params: {
-                query: query,
-                include_adult: false,
-                language: 'en-US',
-                page: 1,
-            }
-        })
-        if(response.status === 200){
-            res.json(response.data);
+    tmdb.get('/search/movie', {
+        params: {
+            query: query,
+            include_adult: false,
+            language: 'en-US',
+            page: 1,
         }
-    }catch (error){
-        console.log('searchMovie failed')
-        throw error
-    }
+    }).then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getGenres = async (req, res) =>{
+    tmdb.get('/genre/movie/list').then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
 }
 
 module.exports = {
     getPopularMovies,
     getMovieById,
-    searchMovie
+    searchMovie,
+    getGenres
 };

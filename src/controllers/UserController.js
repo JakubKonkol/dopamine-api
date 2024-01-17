@@ -1,4 +1,4 @@
-const {createUser, getUserByEmail} = require("../db/usersDB");
+const {createUser, getUserByEmail, deleteUserById, getUserById, updateUserById} = require("../db/usersDB");
 const {random, authentication} = require("../helpers/auth");
 const register = async (req, res) => {
     const {email, username, password} = req.body;
@@ -47,7 +47,61 @@ const login = async (req, res) => {
     res.cookie('sessionToken', user.authentication.sessionToken, {domain: 'localhost', path: '/'})
     return res.status(200).json(user);
 }
+const logout = async (req, res) => {
+    const {identity} = req;
+    identity.authentication.sessionToken = null;
+    await identity.save();
+    res.clearCookie('sessionToken', {domain: 'localhost', path: '/'})
+    return res.status(200).json({message: 'Logged out successfully'});
+}
+const getProfile = async (req, res) => {
+    try{
+        const identity = req.identity;
+        const userDetails = await getUserByEmail(identity.email).select('-authentication.password -authentication.salt -authentication.sessionToken');
+        return res.status(200).json(userDetails);
+    }catch (err) {
+        return res.status(401).json({error: 'Unauthorized'});
+    }
+}
+const deleteUser = async (req, res) => {
+    const id = req.params.userId;
+    try{
+        const userExist = await getUserById(id);
+        if(!userExist){
+            return res.status(400).json({error: 'User does not exist'});
+        }
+        const deletedUser = await deleteUserById(id);
+        return res.status(200).json(deletedUser);
+    }catch (err){
+        console.log(err);
+        return res.status(500).json({error: 'Internal server error'});
+    }
+}
+const updateUsernameAndEmail = async (req, res) => {
+    try{
+        const identity = req.identity;
+        const user = await getUserByEmail(identity.email);
+        if(!user){
+            return res.status(400).json({error: 'User does not exist'});
+        }
+        const {email, username} = req.body;
+        if(!email || !username){
+            return res.status(400).json({error: 'Missing required fields'});
+        }
+        user.email = email;
+        user.username = username;
+        await updateUserById(user._id, user);
+        return res.status(200).json(user);
+    }catch (err) {
+        console.log(err);
+        return res.status(500).json({error: 'Internal server error'});
+    }
+}
 module.exports = {
     register,
     login,
+    getProfile,
+    logout,
+    deleteUser,
+    updateUsernameAndEmail
 }

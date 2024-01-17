@@ -16,9 +16,11 @@ app.use(cookieParser())
 // SETUP ROUTES
 const userRouter = require('./src/routes/users');
 const tmdbRouter = require('./src/routes/tmdb');
+const watchlistRouter = require('./src/routes/watchlist');
 
 app.use('/api/user', userRouter);
 app.use('/api/tmdb', tmdbRouter);
+app.use('/api/watchlist', watchlistRouter);
 
 
 // SETUP MONGODB

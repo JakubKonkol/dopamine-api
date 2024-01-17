@@ -9,9 +9,7 @@ const userSchema = new mongoose.Schema({
         sessionToken: { type: String, select: false },
     },
     userDetails: {
-        watchList: [{
-            movieId: Number,
-        }],
+        watchList: [{ type: Number }],
         playlists: [{
             playlist: [Number],
         }],

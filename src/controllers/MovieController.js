@@ -1,25 +1,19 @@
 const tmdb = require('../api/tmdb');
 
 const getPopularMovies = async (req, res) => {
-    try {
-        const response = await tmdb.get('/movie/popular');
-        const movies = [];
-
-        for (const item of response.data.results) {
-            const detailedMovie = await getMovieById(item.id);
-            movies.push(detailedMovie);
-        }
-
-        res.json(movies);
-    } catch (error) {
-        console.error('Error fetching movies:', error);
+    tmdb.get('/movie/popular').then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        console.log(error);
         res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
+    })
 
-const getMovieById = async (movieId) => {
+};
+const getMovieById = async (req, res) => {
+    let movieId = req.params.movieId;
     try {
         const response = await tmdb.get(`/movie/${movieId}`);
+        res.json(response.data);
         return response.data;
     } catch (error) {
         console.error(`Error fetching movie with id ${movieId}:`, error);
@@ -27,7 +21,8 @@ const getMovieById = async (movieId) => {
     }
 };
 
-const searchMovie = async (query) =>{
+const searchMovie = async (req, res) =>{
+    let query = req.query.query;
     try{
         console.log('searching for movie with query: '+ query)
         const response = await tmdb.get('/search/movie', {
@@ -39,7 +34,7 @@ const searchMovie = async (query) =>{
             }
         })
         if(response.status === 200){
-            return response.data;
+            res.json(response.data);
         }
     }catch (error){
         console.log('searchMovie failed')

@@ -1,4 +1,5 @@
 const tmdb = require('../api/tmdb');
+const {createReview, getReviewByMovieId, deleteReviewByMovieAndReviewId} = require("../db/reviewDB");
 
 const getPopularMovies = async (req, res) => {
     tmdb.get('/movie/popular').then((response) => {
@@ -45,10 +46,51 @@ const getGenres = async (req, res) =>{
         res.status(500).json({ error: 'Internal Server Error' });
     })
 }
+const addReviewForMovie = async (req, res) => {
+    const movieId = req.params.movieId;
+    const userId = req.identity._id;
+    const { review } = req.body;
+    const reviewObj = {
+        movieId: movieId,
+        userId: userId,
+        review: review
+    }
+    try{
+        const review = await createReview(reviewObj);
+        return res.status(200).json(review);
+    }catch (err){
+        console.log(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+ }
 
+const getReviewsForMovie = async (req, res) => {
+    const movieId = req.params.movieId;
+    try{
+        const reviews = await getReviewByMovieId(movieId);
+        return res.status(200).json(reviews);
+    }catch (err){
+        console.log(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+const removeReviewForMovieWithId = async (req, res) => {
+    const movieId = req.params.movieId;
+    const reviewId = req.params.reviewId;
+    try{
+        await deleteReviewByMovieAndReviewId(movieId, reviewId);
+        res.status(200).json({message: 'Review deleted successfully'});
+    }catch (err){
+        console.log(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
 module.exports = {
     getPopularMovies,
     getMovieById,
     searchMovie,
-    getGenres
+    getGenres,
+    addReviewForMovie,
+    getReviewsForMovie,
+    removeReviewForMovieWithId
 };

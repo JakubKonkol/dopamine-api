@@ -18,11 +18,13 @@ const userRouter = require('./src/routes/users');
 const tmdbRouter = require('./src/routes/tmdb');
 const watchlistRouter = require('./src/routes/watchlist');
 const playlistRouter = require('./src/routes/playlist');
+const movieRouter = require('./src/routes/movie');
 
 app.use('/api/user', userRouter);
 app.use('/api/tmdb', tmdbRouter);
 app.use('/api/watchlist', watchlistRouter);
 app.use('/api/playlist', playlistRouter);
+app.use('/api/movie', movieRouter);
 
 
 // SETUP MONGODB

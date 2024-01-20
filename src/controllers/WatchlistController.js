@@ -3,6 +3,12 @@ const {getUserById} = require("../db/usersDB");
 const addMovieToWatchlist = async (req, res) => {
     try {
         const movieId = req.query.movieId;
+        if (!movieId) {
+            return res.status(400).json({ error: 'Movie id not provided' });
+        }
+        if(typeof movieId !== 'number'){
+            return res.status(400).json({ error: 'Movie id should be a number' });
+        }
         const userId = req.identity._id;
         const userData = await getUserById(userId).select('+userDetails.watchList');
         const watchList = userData.userDetails.watchList;

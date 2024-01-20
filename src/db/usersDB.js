@@ -7,6 +7,10 @@ const getUserById = (id) => UserModel.findById(id)
 const createUser = (user) => new UserModel(user).save().then((user)=> user.toObject());
 const updateUserById = (id, user) => UserModel.findByIdAndUpdate(id, user)
 const deleteUserById = (id) => UserModel.findByIdAndDelete(id);
+const getUsersByWatchListCount = (watchListCount)  => UserModel.aggregate([
+    { $match: { 'userDetails.watchList': { $size: watchListCount } } },
+    { $group: { _id: null, count: { $sum: 1 } } },
+]);
 
 module.exports = {
     getAllUsers,
@@ -15,5 +19,6 @@ module.exports = {
     createUser,
     updateUserById,
     deleteUserById,
-    getUserByToken
+    getUserByToken,
+    getUsersByWatchListCount,
 }

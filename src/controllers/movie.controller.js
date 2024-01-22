@@ -1,5 +1,5 @@
 const tmdb = require('../api/tmdb');
-const {createReview, getReviewByMovieId, deleteReviewByMovieAndReviewId} = require("../db/reviewDB");
+const {createReview, getReviewByMovieId, deleteReviewByMovieAndReviewId} = require("../db/review.db");
 
 const getPopularMovies = async (req, res) => {
     tmdb.get('/movie/popular').then((response) => {

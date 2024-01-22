@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const WatchlistController = require('../controllers/WatchlistController');
+const WatchlistController = require('../controllers/watchlist.controller');
 const {isAuthenticated} = require("../helpers/auth");
 
 router.post('/', isAuthenticated, WatchlistController.addMovieToWatchlist);

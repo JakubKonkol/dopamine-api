@@ -1,4 +1,4 @@
-const { getUserById } = require('../db/usersDB');
+const { getUserById } = require('../db/users.db');
 
 const createPlaylist = async (req, res) => {
     const name = req.query.name;

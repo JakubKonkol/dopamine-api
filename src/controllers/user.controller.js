@@ -1,4 +1,4 @@
-const {createUser, getUserByEmail, deleteUserById, getUserById, updateUserById} = require("../db/usersDB");
+const {createUser, getUserByEmail, deleteUserById, getUserById, updateUserById} = require("../db/users.db");
 const {random, authentication} = require("../helpers/auth");
 const register = async (req, res) => {
     const {email, username, password} = req.body;

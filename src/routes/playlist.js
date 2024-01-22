@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const PlaylistController = require('../controllers/PlaylistController');
+const PlaylistController = require('../controllers/playlist.controller');
 const {isAuthenticated} = require("../helpers/auth");
 
 router.post('/', isAuthenticated, PlaylistController.createPlaylist)

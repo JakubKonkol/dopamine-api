@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const {getUserByToken} = require("../db/usersDB");
+const {getUserByToken} = require("../db/users.db");
 const {merge, get} = require("lodash");
 
 const SECRET = 'DOPAMINE';

@@ -1,4 +1,4 @@
-const {getUserById} = require("../db/usersDB");
+const {getUserById} = require("../db/users.db");
 
 const addMovieToWatchlist = async (req, res) => {
     try {

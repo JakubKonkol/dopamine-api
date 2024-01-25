@@ -11,6 +11,11 @@ const getUsersByWatchListCount = (watchListCount)  => UserModel.aggregate([
     { $match: { 'userDetails.watchList': { $size: watchListCount } } },
     { $group: { _id: null, count: { $sum: 1 } } },
 ]);
+const getUsersWithMostPlaylists = () => UserModel.aggregate([
+    { $project: { playlistCount: { $size: '$userDetails.playlists' } } },
+    { $sort: { playlistCount: -1 } },
+    { $limit: 5 },
+]);
 
 module.exports = {
     getAllUsers,
@@ -21,4 +26,5 @@ module.exports = {
     deleteUserById,
     getUserByToken,
     getUsersByWatchListCount,
+    getUsersWithMostPlaylists
 }

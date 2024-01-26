@@ -1,11 +1,19 @@
 const {createUser, getUserByEmail, deleteUserById, getUserById, updateUserById} = require("../db/users.db");
 const {random, authentication} = require("../helpers/auth");
-// Add email, password validation
+const {isEmailValid, isPasswordValid} = require("../helpers/validators");
 const register = async (req, res) => {
     const {email, username, password} = req.body;
 
     if (!email || !password || !username) {
         res.status(400).json({error: 'Missing required fields'});
+        return;
+    }
+    if(!isEmailValid(email)){
+        res.status(400).json({error: 'Invalid email'});
+        return;
+    }
+    if(!isPasswordValid(password)){
+        res.status(400).json({error: 'Invalid password'});
         return;
     }
     const existUser = await getUserByEmail(email);
@@ -27,7 +35,6 @@ const register = async (req, res) => {
         res.status(500).json({error: err});
     })
 }
-// Add email, password validation
 const login = async (req, res) => {
     const {email, password} = req.body;
 
@@ -38,6 +45,12 @@ const login = async (req, res) => {
 
     if (!user) {
         return res.status(400).json({error: 'User does not exist'});
+    }
+    if(!isPasswordValid(password)){
+        return res.status(400).json({error: 'Invalid password'});
+    }
+    if(!isEmailValid(email)){
+        return res.status(400).json({error: 'Invalid email'});
     }
     const expectedHash = authentication(user.authentication.salt, password);
     if (user.authentication.password !== expectedHash) {

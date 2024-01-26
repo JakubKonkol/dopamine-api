@@ -45,6 +45,7 @@ const updatePlaylist = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+//check if exists
 const removePlaylist = async (req, res) => {
     const playlistID = req.params.playlistID;
     try{

@@ -1,5 +1,6 @@
 const {createUser, getUserByEmail, deleteUserById, getUserById, updateUserById} = require("../db/users.db");
 const {random, authentication} = require("../helpers/auth");
+// Add email, password validation
 const register = async (req, res) => {
     const {email, username, password} = req.body;
 
@@ -26,6 +27,7 @@ const register = async (req, res) => {
         res.status(500).json({error: err});
     })
 }
+// Add email, password validation
 const login = async (req, res) => {
     const {email, password} = req.body;
 

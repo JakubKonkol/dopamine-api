@@ -39,7 +39,7 @@ const searchMovie = async (req, res) =>{
     })
 }
 const getGenres = async (req, res) =>{
-    tmdb.get('/genre/movie/list').then((response) => {
+    tmdb.get('/genre/movie/list?language=en').then((response) => {
         res.json(response.data);
     }).catch((error) => {
         console.log(error);

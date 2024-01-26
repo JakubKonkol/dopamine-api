@@ -1,14 +1,15 @@
 const {getUserById} = require("../db/users.db");
-
+//add validation
 const addMovieToWatchlist = async (req, res) => {
     try {
         const movieId = req.query.movieId;
         if (!movieId) {
             return res.status(400).json({ error: 'Movie id not provided' });
         }
-        if(typeof movieId !== 'number'){
-            return res.status(400).json({ error: 'Movie id should be a number' });
-        }
+        //not working
+        // if(typeof movieId !== 'number'){
+        //     return res.status(400).json({ error: 'Movie id should be a number' });
+        // }
         const userId = req.identity._id;
         const userData = await getUserById(userId).select('+userDetails.watchList');
         const watchList = userData.userDetails.watchList;
@@ -36,6 +37,7 @@ const getUserWatchlist = async (req, res) => {
         res.status(500).json({error: err.message || 'Internal Server Error'});
     }
 }
+//check if exists and fix this because it removes last index not the given one
 const deleteMovieFromWatchlist = async (req, res) => {
     try{
         const movieId = req.params.movieId;

@@ -35,6 +35,7 @@ const updatePlaylist = async (req, res) => {
         const currentUserID = req.identity._id;
         const user = await getUserById(currentUserID).select('-authentication.password -authentication.salt -authentication.sessionToken');
         const playlist = user.userDetails.playlists.id(playlistID);
+        if(!playlist) return res.status(400).json({error: 'Playlist does not exist'})
         playlist.name = updatedPlaylist.name;
         playlist.movies = updatedPlaylist.movies;
         playlist.tvSeries = updatedPlaylist.tvSeries;
@@ -52,6 +53,7 @@ const removePlaylist = async (req, res) => {
         const currentUserID = req.identity._id;
         const user = await getUserById(currentUserID).select('-authentication.password -authentication.salt -authentication.sessionToken');
         const playlist = user.userDetails.playlists.id(playlistID);
+        if(!playlist) return res.status(400).json({error: 'Playlist does not exist'})
         user.userDetails.playlists.splice(user.userDetails.playlists.indexOf(playlist), 1);
         await user.save();
         return res.status(200).json({message: 'Playlist removed successfully'});

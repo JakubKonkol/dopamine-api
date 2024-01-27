@@ -1,5 +1,5 @@
 const tmdb = require('../api/tmdb');
-const {createReview, getReviewByMovieId, deleteReviewByMovieAndReviewId} = require("../db/review.db");
+const {createReview, getReviewByMovieId, deleteReviewByMovieAndReviewId, getReviewById} = require("../db/review.db");
 
 const getPopularMovies = async (req, res) => {
     tmdb.get('/movie/popular').then((response) => {
@@ -13,12 +13,15 @@ const getPopularMovies = async (req, res) => {
 const getMovieById = async (req, res) => {
     let movieId = req.params.movieId;
     try {
-        const response = await tmdb.get(`/movie/${movieId}`);
-        res.json(response.data);
-        return response.data;
+        tmdb.get(`/movie/${movieId}`).then((response) => {
+           return res.json(response.data);
+        }).catch((error) => {
+            console.log(error);
+            res.status(404).json({ error: 'Invalid id or movie not found.' });
+        });
     } catch (error) {
-        console.error(`Error fetching movie with id ${movieId}:`, error);
-        throw error;
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
@@ -50,6 +53,8 @@ const addReviewForMovie = async (req, res) => {
     const movieId = req.params.movieId;
     const userId = req.identity._id;
     const { review } = req.body;
+    const existingMovie = await getMovieById(movieId);
+    if(!existingMovie) return res.status(400).json({error: 'Movie does not exist'});
     const reviewObj = {
         movieId: movieId,
         userId: userId,
@@ -78,11 +83,13 @@ const removeReviewForMovieWithId = async (req, res) => {
     const movieId = req.params.movieId;
     const reviewId = req.params.reviewId;
     try{
+        const existingReview = await getReviewById(reviewId);
+        if(!existingReview) return res.status(400).json({error: 'Review does not exist'});
         await deleteReviewByMovieAndReviewId(movieId, reviewId);
         res.status(200).json({message: 'Review deleted successfully'});
     }catch (err){
         console.log(err);
-        res.status(500).json({error: 'Internal Server Error'});
+        res.status(500).json({error: err.message || 'Internal Server Error'});
     }
 }
 module.exports = {

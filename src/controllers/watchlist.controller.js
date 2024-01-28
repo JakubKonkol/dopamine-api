@@ -42,6 +42,12 @@ const deleteMovieFromWatchlist = async (req, res) => {
     try{
         const movieId = req.params.movieId;
         const userId = req.identity._id;
+        if(isNaN(movieId)){
+            return res.status(400).json({error: 'Movie id should be a number'});
+        }
+        if(movieId < 0){
+            return res.status(400).json({error: 'Movie id should be a positive number'});
+        }
         let userData = await getUserById(userId).select('+userDetails.watchList');
         let watchList = userData.userDetails.watchList;
         if(!watchList.includes(movieId)){

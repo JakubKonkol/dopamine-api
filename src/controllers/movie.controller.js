@@ -53,8 +53,6 @@ const addReviewForMovie = async (req, res) => {
     const movieId = req.params.movieId;
     const userId = req.identity._id;
     const { review } = req.body;
-    const existingMovie = await getMovieById(movieId);
-    if(!existingMovie) return res.status(400).json({error: 'Movie does not exist'});
     const reviewObj = {
         movieId: movieId,
         userId: userId,
@@ -71,6 +69,7 @@ const addReviewForMovie = async (req, res) => {
 
 const getReviewsForMovie = async (req, res) => {
     const movieId = req.params.movieId;
+    if(isNaN(movieId)) return res.status(400).json({error: 'Movie id should be a number'});
     try{
         const reviews = await getReviewByMovieId(movieId);
         return res.status(200).json(reviews);
@@ -81,6 +80,7 @@ const getReviewsForMovie = async (req, res) => {
 }
 const removeReviewForMovieWithId = async (req, res) => {
     const movieId = req.params.movieId;
+    if(isNaN(movieId)) return res.status(400).json({error: 'Movie id should be a number'});
     const reviewId = req.params.reviewId;
     try{
         const existingReview = await getReviewById(reviewId);
@@ -88,8 +88,7 @@ const removeReviewForMovieWithId = async (req, res) => {
         await deleteReviewByMovieAndReviewId(movieId, reviewId);
         res.status(200).json({message: 'Review deleted successfully'});
     }catch (err){
-        console.log(err);
-        res.status(500).json({error: err.message || 'Internal Server Error'});
+        res.status(500).json({error: 'Internal Server Error, Please enter valid movie id and review id'});
     }
 }
 module.exports = {

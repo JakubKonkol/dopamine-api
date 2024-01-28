@@ -88,18 +88,22 @@ const deleteUser = async (req, res) => {
         const deletedUser = await deleteUserById(id);
         return res.status(200).json(deletedUser);
     }catch (err){
-        console.log(err);
-        return res.status(500).json({error: 'Internal server error'});
+        return res.status(500).json({error: 'Internal server error, please enter valid user id'});
     }
 }
 const updateUsernameAndEmail = async (req, res) => {
     try{
         const identity = req.identity;
+
         const user = await getUserByEmail(identity.email);
         if(!user){
             return res.status(400).json({error: 'User does not exist'});
         }
         const {email, username} = req.body;
+        if(!isEmailValid(email)){
+            res.status(400).json({error: 'Invalid email'});
+            return;
+        }
         if(!email || !username){
             return res.status(400).json({error: 'Missing required fields'});
         }

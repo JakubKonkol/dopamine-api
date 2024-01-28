@@ -8,6 +8,7 @@ const credentials = require('./src/db/credentials.json');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const cookieParser = require("cookie-parser");
+const {createDefaultAdmin} = require("./src/controllers/user.controller");
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -19,12 +20,15 @@ const tmdbRouter = require('./src/routes/tmdb');
 const watchlistRouter = require('./src/routes/watchlist');
 const playlistRouter = require('./src/routes/playlist');
 const movieRouter = require('./src/routes/movie');
+const adminRouter = require('./src/routes/admin');
+
 
 app.use('/api/user', userRouter);
 app.use('/api/tmdb', tmdbRouter);
 app.use('/api/watchlist', watchlistRouter);
 app.use('/api/playlist', playlistRouter);
 app.use('/api/movie', movieRouter);
+app.use('/api/admin', adminRouter);
 
 
 // SETUP MONGODB
@@ -42,6 +46,9 @@ app.use(
     swaggerUi.serve,
     swaggerUi.setup(swaggerJsdoc(require("./swagger.json")))
 );
+createDefaultAdmin().catch((err) => {
+    console.log(err);
+})
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
 })

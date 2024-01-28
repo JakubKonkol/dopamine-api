@@ -112,11 +112,34 @@ const updateUsernameAndEmail = async (req, res) => {
         return res.status(500).json({error: 'Internal server error'});
     }
 }
+const createDefaultAdmin = async () =>{
+    const username = 'dopamine'
+    const email = 'dopamine@admin.com'
+    const password = 'dopamine'
+    const salt = random();
+    const existUser = await getUserByEmail(email);
+    if (existUser) {
+        return;
+    }
+    createUser({
+        email,
+        username,
+        isAdmin: true,
+        authentication: {
+            salt,
+            password: authentication(salt, password)
+        }
+    }).catch((err) => {
+        console.log(err);
+    })
+
+}
 module.exports = {
     register,
     login,
     getProfile,
     logout,
     deleteUser,
-    updateUsernameAndEmail
+    updateUsernameAndEmail,
+    createDefaultAdmin
 }

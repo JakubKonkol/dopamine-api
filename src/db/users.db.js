@@ -1,6 +1,6 @@
 const UserModel = require('../model/user');
 
-const getAllUsers = () => UserModel.find();
+const getAll = () => UserModel.find();
 const getUserByEmail = (email) => UserModel.findOne({email})
 const getUserByToken = (token) => UserModel.findOne({'authentication.sessionToken': token})
 const getUserById = (id) => UserModel.findById(id)
@@ -16,10 +16,23 @@ const getUsersWithMostPlaylists = () => UserModel.aggregate([
     { $sort: { playlistCount: -1 } },
     { $limit: 5 },
 ]);
-// More
+const getUsersWithWatchListCountGreaterThan = (count) => UserModel.aggregate([
+    {
+        $match: {
+            $expr: { $gt: [{ $size: '$userDetails.watchList' }, count] }
+        }
+    }
+]);
+const getUsersWithPlaylistName = (playlistName) => UserModel.find({
+    'userDetails.playlists.name': playlistName
+});
+const updatePlaylistNameForUser = (userId, playlistId, newName) => UserModel.updateOne(
+    { _id: userId, 'userDetails.playlists._id': playlistId },
+    { $set: { 'userDetails.playlists.$.name': newName } }
+);
 
 module.exports = {
-    getAllUsers,
+    getAll,
     getUserByEmail,
     getUserById,
     createUser,
@@ -27,5 +40,8 @@ module.exports = {
     deleteUserById,
     getUserByToken,
     getUsersByWatchListCount,
-    getUsersWithMostPlaylists
+    getUsersWithMostPlaylists,
+    getUsersWithWatchListCountGreaterThan,
+    getUsersWithPlaylistName,
+    updatePlaylistNameForUser
 }

@@ -45,10 +45,23 @@ const isOwner = (req, res, next) => {
         return res.status(401).json({error: 'Unauthorized'});
     }
 }
+const isAdmin = (req, res, next) => {
+    try{
+        const isAdmin = get(req, 'identity.isAdmin');
+        if(!isAdmin){
+            return res.status(401).json({error: 'Unauthorized'});
+        }
+        next();
+    }catch (err) {
+        console.log(err);
+        return res.status(401).json({error: 'Unauthorized'});
+    }
 
+}
 module.exports = {
     authentication,
     random,
     isAuthenticated,
     isOwner,
+    isAdmin
 }

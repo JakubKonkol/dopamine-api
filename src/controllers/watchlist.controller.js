@@ -8,6 +8,9 @@ const addMovieToWatchlist = async (req, res) => {
         if (isNaN(movieId)) {
             return res.status(400).json({ error: 'Movie id should be a number' });
         }
+        if(movieId < 0){
+            return res.status(400).json({ error: 'Movie id should be a positive number' });
+        }
         const userId = req.identity._id;
         const userData = await getUserById(userId).select('+userDetails.watchList');
         const watchList = userData.userDetails.watchList;
@@ -35,17 +38,19 @@ const getUserWatchlist = async (req, res) => {
         res.status(500).json({error: err.message || 'Internal Server Error'});
     }
 }
-//check if exists and fix this because it removes last index not the given one
 const deleteMovieFromWatchlist = async (req, res) => {
     try{
         const movieId = req.params.movieId;
         const userId = req.identity._id;
-        const userData = await getUserById(userId).select('+userDetails.watchList');
-        const watchList = userData.userDetails.watchList;
+        let userData = await getUserById(userId).select('+userDetails.watchList');
+        let watchList = userData.userDetails.watchList;
+        if(!watchList.includes(movieId)){
+            return res.status(400).json({error: 'Movie does not exist in watchlist'});
+        }
         watchList.splice(watchList.indexOf(movieId), 1);
         userData.userDetails.watchList = watchList;
         await userData.save();
-        return res.status(200).json({message: 'Movie deleted from watchlist successfully', watchList});
+        return res.status(200).json({message: 'Movie deleted from watchlist successfully'});
     }catch (err) {
         res.status(500).json({error: err.message || 'Internal Server Error'});
     }

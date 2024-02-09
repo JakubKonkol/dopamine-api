@@ -5,22 +5,77 @@ const getPopularMovies = async (req, res) => {
     tmdb.get('/movie/popular').then((response) => {
         res.json(response.data);
     }).catch((error) => {
-        console.log(error);
         res.status(500).json({ error: 'Internal Server Error' });
     })
 
 };
+const getTopRatedMovies = async (req, res) => {
+    tmdb.get('/movie/top_rated').then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getUpcomingMovies = async (req, res) => {
+    tmdb.get('/movie/upcoming').then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getSimilarMovies = async (req, res) => {
+    let movieId = req.params.movieId;
+    tmdb.get(`/movie/${movieId}/similar`).then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getMovieImages = async (req, res) => {
+    let movieId = req.params.movieId;
+    tmdb.get(`/movie/${movieId}/images`).then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getTrendingMovies = async (req, res) => {
+    tmdb.get('/trending/movie/day').then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getMovieCast = async (req, res) => {
+    let movieId = req.params.movieId;
+    tmdb.get(`/movie/${movieId}/credits`).then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+const getWatchProviders = async (req, res) => {
+    let movieId = req.params.movieId;
+    let region = req.query.region;
+    tmdb.get(`/movie/${movieId}/watch/providers`, {
+        params: {
+            region: region
+        }
+    }).then((response) => {
+        res.json(response.data);
+    }).catch((error) => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
 const getMovieById = async (req, res) => {
     let movieId = req.params.movieId;
     try {
         tmdb.get(`/movie/${movieId}`).then((response) => {
            return res.json(response.data);
         }).catch((error) => {
-            console.log(error);
             res.status(404).json({ error: 'Invalid id or movie not found.' });
         });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -37,7 +92,6 @@ const searchMovie = async (req, res) =>{
     }).then((response) => {
         res.json(response.data);
     }).catch((error) => {
-        console.log(error);
         res.status(500).json({ error: 'Internal Server Error' });
     })
 }
@@ -45,7 +99,6 @@ const getGenres = async (req, res) =>{
     tmdb.get('/genre/movie/list?language=en').then((response) => {
         res.json(response.data);
     }).catch((error) => {
-        console.log(error);
         res.status(500).json({ error: 'Internal Server Error' });
     })
 }
@@ -62,7 +115,6 @@ const addReviewForMovie = async (req, res) => {
         const review = await createReview(reviewObj);
         return res.status(200).json(review);
     }catch (err){
-        console.log(err);
         res.status(500).json({error: 'Internal Server Error'});
     }
  }
@@ -74,7 +126,6 @@ const getReviewsForMovie = async (req, res) => {
         const reviews = await getReviewByMovieId(movieId);
         return res.status(200).json(reviews);
     }catch (err){
-        console.log(err);
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
@@ -98,5 +149,12 @@ module.exports = {
     getGenres,
     addReviewForMovie,
     getReviewsForMovie,
-    removeReviewForMovieWithId
+    removeReviewForMovieWithId,
+    getTopRatedMovies,
+    getUpcomingMovies,
+    getSimilarMovies,
+    getMovieImages,
+    getTrendingMovies,
+    getMovieCast,
+    getWatchProviders
 };

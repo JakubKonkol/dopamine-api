@@ -36,6 +36,14 @@ describe('auth', () => {
     expect(res.headers['set-cookie'].join(';')).toMatch(/dopamine_token=.*HttpOnly/);
   });
 
+  it('reports the session without failing for anonymous users', async () => {
+    const anon = await request(app).get('/api/auth/session').expect(200);
+    expect(anon.body.user).toBeNull();
+    const agent = await signedInAgent();
+    const res = await agent.get('/api/auth/session').expect(200);
+    expect(res.body.user.email).toBe(credentials.email);
+  });
+
   it('rejects invalid payloads with field details', async () => {
     const res = await request(app).post('/api/auth/register').send({ email: 'nope', username: 'x', password: '1' }).expect(400);
     expect(res.body.details.map((d) => d.path)).toEqual(expect.arrayContaining(['email', 'username', 'password']));

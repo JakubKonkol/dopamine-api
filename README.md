@@ -50,6 +50,7 @@ Full interactive documentation: **http://localhost:8080/api-docs**
 | `POST` | `/api/auth/register` | – | Create account |
 | `POST` | `/api/auth/login` | – | Sign in (sets cookie, returns token) |
 | `POST` | `/api/auth/logout` | – | Clear cookie |
+| `GET` | `/api/auth/session` | – | Current user or `null` |
 | `GET` | `/api/auth/me` | ✓ | Current user |
 | `PATCH` | `/api/users/me` | ✓ | Update username / email |
 | `PUT` | `/api/users/me/password` | ✓ | Change password |

@@ -38,6 +38,11 @@ export function logout(_req, res) {
   res.status(204).end();
 }
 
+/** Like `me`, but never 401s: lets the SPA restore a session without console noise. */
+export function session(req, res) {
+  res.json({ user: req.user ? req.user.toPublic() : null });
+}
+
 export function me(req, res) {
   res.json({ user: req.user.toPublic() });
 }

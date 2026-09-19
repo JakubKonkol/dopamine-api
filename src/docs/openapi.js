@@ -131,6 +131,9 @@ export const openapi = {
       },
     },
     '/api/auth/logout': { post: { tags: ['Auth'], summary: 'Sign out (clears cookie)', responses: { 204: { description: 'No content' } } } },
+    '/api/auth/session': {
+      get: { tags: ['Auth'], summary: 'Current user or null (never 401)', responses: { 200: { description: 'OK', ...json({ type: 'object', properties: { user: { ...user, nullable: true } } }) } } },
+    },
     '/api/auth/me': {
       get: { tags: ['Auth'], summary: 'Current user', security: secured, responses: { 200: { description: 'OK', ...json({ type: 'object', properties: { user } }) }, 401: { description: 'Unauthorized' } } },
     },

@@ -25,17 +25,20 @@ npm run dev               # http://localhost:8080
 ```
 
 `npm run dev` restarts on file changes and loads `.env` automatically. Use `npm start` in production.
+The env is validated on boot with zod – a missing `TMDB_API_KEY` or `JWT_SECRET` fails fast with a
+clear message. Auth endpoints are limited to 20 requests per 15 minutes per IP.
 
 ### Environment variables
 
 | Variable | Default | Description |
 | --- | --- | --- |
+| `NODE_ENV` | `development` | `development`, `test` or `production` |
 | `PORT` | `8080` | HTTP port |
 | `MONGODB_URI` | `mongodb://127.0.0.1:27017/dopamine-db` | MongoDB connection string |
-| `JWT_SECRET` | – | **Required.** Long random string used to sign tokens |
+| `JWT_SECRET` | – | **Required.** Random string (≥ 16 chars) used to sign tokens |
 | `JWT_EXPIRES_IN` | `7d` | Token lifetime |
 | `COOKIE_SECURE` | `false` | Set `true` behind HTTPS |
-| `CORS_ORIGIN` | `http://localhost:4200` | Comma-separated allowed origins |
+| `CORS_ORIGIN` | `http://localhost:4200` | Comma-separated allowed origins (credentials enabled) |
 | `TMDB_API_KEY` | – | **Required.** TMDB v3 API key |
 | `TMDB_LANGUAGE` | `en-US` | Language for TMDB metadata |
 | `TMDB_REGION` | `PL` | Region for watch providers, upcoming and now-playing lists |
@@ -86,6 +89,7 @@ Errors are always `{ "message": string, "details"?: [{ path, message }] }`.
 npm run dev     # start with file watching
 npm start       # start
 npm test        # vitest (unit + integration; integration tests use MONGODB_TEST_URI or mongodb://127.0.0.1:27017/dopamine-test)
+npm run test:watch
 npm run lint    # eslint
 ```
 
@@ -93,14 +97,25 @@ npm run lint    # eslint
 
 ```
 src/
-  app.js               express app factory (middleware + routes)
+  app.js               express app factory (helmet, CORS, JSON, cookies, routes, error handling)
   server.js            bootstrap: db connection, admin seed, listen
-  config/              env validation (zod), database
-  lib/                 TMDB client + cache, HttpError helpers
-  middleware/          auth (JWT), validation, error handling
-  models/              mongoose schemas
+  config/
+    env.js             zod-validated environment
+    db.js              mongoose connection
+  lib/
+    tmdb.js            TMDB client (axios) with response normalisation
+    cache.js           in-memory TTL cache (max 2000 entries)
+    errors.js          HttpError helpers
+  middleware/
+    auth.js            attachUser / requireAuth / requireAdmin (JWT from cookie or Bearer)
+    validate.js        zod request validation
+    error-handler.js   404 + consistent JSON error responses
+  models/
+    user.model.js      user with embedded library (watchlist/history) and playlists
   modules/
-    auth/ users/ library/ playlists/ tmdb/ admin/
-  docs/openapi.js      OpenAPI document for /api-docs
-test/                  vitest + supertest
+    auth/ users/ library/ playlists/ tmdb/ admin/   routers (+ controllers/schemas/service where needed)
+  docs/openapi.js      OpenAPI document served at /api-docs
+test/
+  api.test.js          supertest integration suite (needs MongoDB)
+  tmdb.unit.test.js    TMDB normalisation unit tests
 ```

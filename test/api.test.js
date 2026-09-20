@@ -99,6 +99,47 @@ describe('library', () => {
   });
 });
 
+describe('import', () => {
+  it('merges a bundle idempotently, letting history win over the watchlist', async () => {
+    const agent = await signedInAgent();
+    await agent.put('/api/library/watchlist/movie/550').expect(200);
+
+    const bundle = {
+      watchlist: [
+        { mediaType: 'movie', tmdbId: 550 },
+        { mediaType: 'tv', tmdbId: 1399, addedAt: '2020-01-01T00:00:00.000Z' },
+      ],
+      history: [
+        { mediaType: 'movie', tmdbId: 550, addedAt: '2019-05-03T18:15:08.000Z' },
+        { mediaType: 'movie', tmdbId: 603 },
+      ],
+      playlists: [{ name: 'Favourites', items: [{ mediaType: 'tv', tmdbId: 1399 }, { mediaType: 'movie', tmdbId: 603 }] }],
+    };
+
+    const first = await agent.post('/api/import').send(bundle).expect(200);
+    expect(first.body.added).toEqual({ history: 2, watchlist: 1, playlists: 1, playlistItems: 2 });
+    expect(first.body.skipped.alreadyPresent).toBe(1);
+    expect(first.body.library.watchlist.map((r) => r.tmdbId)).toEqual([1399]);
+    expect(first.body.library.history.map((r) => r.tmdbId).sort()).toEqual([550, 603]);
+    expect(first.body.library.history.find((r) => r.tmdbId === 550).addedAt).toBe('2019-05-03T18:15:08.000Z');
+
+    const again = await agent.post('/api/import').send(bundle).expect(200);
+    expect(again.body.added).toEqual({ history: 0, watchlist: 0, playlists: 0, playlistItems: 0 });
+    expect(again.body.skipped.alreadyPresent).toBe(4);
+
+    const playlists = await agent.get('/api/playlists').expect(200);
+    expect(playlists.body.playlists).toHaveLength(1);
+    expect(playlists.body.playlists[0].items).toHaveLength(2);
+  });
+
+  it('rejects empty bundles and items without any id', async () => {
+    const agent = await signedInAgent();
+    await agent.post('/api/import').send({}).expect(400);
+    const res = await agent.post('/api/import').send({ history: [{ mediaType: 'movie' }] }).expect(400);
+    expect(res.body.details[0].path).toBe('history.0');
+  });
+});
+
 describe('playlists', () => {
   it('supports the full CRUD lifecycle', async () => {
     const agent = await signedInAgent();

@@ -8,6 +8,7 @@ Node.js · Express 5 · MongoDB (Mongoose) · JWT auth · cached proxy over [TMD
 - **Auth** – register / login / logout, JWT stored in an `httpOnly` cookie (Bearer header also accepted), bcrypt password hashing, rate-limited auth endpoints.
 - **Library** – watchlist and watch history per user, viewing statistics (watch time, top genres, decades).
 - **Playlists** – named collections of movies and TV shows.
+- **Import** – merge a library bundle (watchlist, history, playlists) into an account; the Dopamine web app builds one from a [Bingers](https://bingers.app/) export. TVDB-only ids are resolved through TMDB.
 - **TMDB proxy** – trending, curated lists, search, discover, rich movie / TV / person details and **"where to watch" for Poland** (JustWatch data via TMDB). Responses are normalised to camelCase and cached in memory.
 - **Admin** – list users, change roles, delete accounts.
 - Input validation with zod, consistent JSON errors, OpenAPI docs at `/api-docs`.
@@ -66,6 +67,7 @@ Full interactive documentation: **http://localhost:8080/api-docs**
 | `GET` `PATCH` `DELETE` | `/api/playlists/:id` | ✓ | Read / rename / delete playlist |
 | `POST` | `/api/playlists/:id/items` | ✓ | Add title to playlist |
 | `DELETE` | `/api/playlists/:id/items/:mediaType/:tmdbId` | ✓ | Remove title from playlist |
+| `POST` | `/api/import` | ✓ | Merge `{ watchlist, history, playlists }` into the account (idempotent, body up to 5 MB) |
 | `GET` | `/api/tmdb/trending/:mediaType?window=day\|week` | – | Trending (`all`, `movie`, `tv`) |
 | `GET` | `/api/tmdb/lists/:mediaType/:list` | – | `popular`, `top_rated`, `upcoming`, `now_playing`, `on_the_air`, `airing_today` |
 | `GET` | `/api/tmdb/search?query=&type=multi\|movie\|tv\|person` | – | Search |
@@ -113,7 +115,7 @@ src/
   models/
     user.model.js      user with embedded library (watchlist/history) and playlists
   modules/
-    auth/ users/ library/ playlists/ tmdb/ admin/   routers (+ controllers/schemas/service where needed)
+    auth/ users/ library/ playlists/ import/ tmdb/ admin/   routers (+ controllers/schemas/service where needed)
   docs/openapi.js      OpenAPI document served at /api-docs
 test/
   api.test.js          supertest integration suite (needs MongoDB)

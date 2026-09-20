@@ -39,6 +39,18 @@ const page = {
   },
 };
 
+const importItem = {
+  type: 'object',
+  description: 'A title to import. Either tmdbId or tvdbId is required; TVDB ids are resolved through TMDB.',
+  properties: {
+    mediaType: { type: 'string', enum: ['movie', 'tv'] },
+    tmdbId: { type: 'integer' },
+    tvdbId: { type: 'integer' },
+    title: { type: 'string', description: 'Only used to describe unresolved items in the summary' },
+    addedAt: { type: 'string', format: 'date-time' },
+  },
+};
+
 const user = {
   type: 'object',
   properties: {
@@ -90,6 +102,7 @@ export const openapi = {
     { name: 'Users' },
     { name: 'Library', description: 'Watchlist and watch history' },
     { name: 'Playlists' },
+    { name: 'Import', description: 'Bulk import from other apps (e.g. Bingers)' },
     { name: 'TMDB', description: 'Cached proxy over The Movie Database' },
     { name: 'Admin' },
   ],
@@ -197,6 +210,50 @@ export const openapi = {
           { name: 'tmdbId', in: 'path', required: true, schema: { type: 'integer' } },
         ],
         responses: { 200: { description: 'Updated library' } },
+      },
+    },
+
+    '/api/import': {
+      post: {
+        tags: ['Import'],
+        summary: 'Merge a library bundle into the account',
+        description:
+          'Idempotent merge: nothing is removed, duplicates are skipped, history wins over the watchlist and playlists are matched by name.',
+        security: secured,
+        requestBody: json({
+          type: 'object',
+          properties: {
+            watchlist: { type: 'array', items: importItem },
+            history: { type: 'array', items: importItem },
+            playlists: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['name'],
+                properties: { name: { type: 'string' }, description: { type: 'string' }, items: { type: 'array', items: importItem } },
+              },
+            },
+          },
+        }),
+        responses: {
+          200: {
+            description: 'Import summary and the updated library',
+            ...json({
+              type: 'object',
+              properties: {
+                added: {
+                  type: 'object',
+                  properties: { history: { type: 'integer' }, watchlist: { type: 'integer' }, playlists: { type: 'integer' }, playlistItems: { type: 'integer' } },
+                },
+                skipped: {
+                  type: 'object',
+                  properties: { alreadyPresent: { type: 'integer' }, unresolved: { type: 'array', items: importItem } },
+                },
+                library: { type: 'object', properties: { watchlist: { type: 'array', items: mediaRef }, history: { type: 'array', items: mediaRef } } },
+              },
+            }),
+          },
+        },
       },
     },
 

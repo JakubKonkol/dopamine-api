@@ -1,6 +1,6 @@
 import { tmdbGet, TTL } from '../../lib/tmdb.js';
 
-function serializeLibrary(user) {
+export function serializeLibrary(user) {
   const byNewest = (a, b) => b.addedAt - a.addedAt;
   return {
     watchlist: [...user.library.watchlist].sort(byNewest),

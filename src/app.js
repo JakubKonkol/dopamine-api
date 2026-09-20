@@ -9,6 +9,7 @@ import { attachUser } from './middleware/auth.js';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.js';
 import adminRoutes from './modules/admin/admin.routes.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import importRoutes from './modules/import/import.routes.js';
 import libraryRoutes from './modules/library/library.routes.js';
 import playlistRoutes from './modules/playlists/playlists.routes.js';
 import tmdbRoutes from './modules/tmdb/tmdb.routes.js';
@@ -27,7 +28,10 @@ export function createApp() {
       credentials: true,
     }),
   );
-  app.use(express.json({ limit: '100kb' }));
+  // Import bundles (whole libraries) are far bigger than any other request.
+  const json = express.json({ limit: '100kb' });
+  const importJson = express.json({ limit: '5mb' });
+  app.use((req, res, next) => (req.path.startsWith('/api/import') ? importJson : json)(req, res, next));
   app.use(cookieParser());
   app.use(attachUser);
 
@@ -37,6 +41,7 @@ export function createApp() {
   app.use('/api/users', userRoutes);
   app.use('/api/library', libraryRoutes);
   app.use('/api/playlists', playlistRoutes);
+  app.use('/api/import', importRoutes);
   app.use('/api/tmdb', tmdbRoutes);
   app.use('/api/admin', adminRoutes);
 
